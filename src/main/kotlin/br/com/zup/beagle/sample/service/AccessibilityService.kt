@@ -5,6 +5,7 @@ import br.com.zup.beagle.action.NavigationType
 import br.com.zup.beagle.action.ShowNativeDialog
 import br.com.zup.beagle.core.Accessibility
 import br.com.zup.beagle.core.Appearance
+import br.com.zup.beagle.core.ServerDrivenComponent
 import br.com.zup.beagle.sample.models.Product
 import br.com.zup.beagle.sample.widget.CounterWidget
 import br.com.zup.beagle.sample.widget.ProductWidget
@@ -99,24 +100,10 @@ private class AccessibilityScreenBuilder(private val productService: ProductServ
 
 
     private fun createProductWidget(productsMap: List<Product>): List<Widget> {
-        val productList = mutableListOf<Widget>()
-
-        for (product in productsMap) {
-            productList.add(
-                    Container(
-                            children = listOf(
-                                    createProduct(product),
-                                    createProduct(product)
-                            )
-                    ).applyFlex(Flex(
-                            flexDirection = FlexDirection.ROW
-                    ))
-            )
-        }
-        return productList
+        return productsMap.mapIndexed(this::createProduct).chunked(2).mapIndexed(this::createContainer)
     }
 
-    private fun createProduct(product: Product): Widget {
+    private fun createProduct(index: Int, product: Product): Widget {
         return ProductWidget(
                 product.id,
                 product.sku,
@@ -128,6 +115,14 @@ private class AccessibilityScreenBuilder(private val productService: ProductServ
         ).applyFlex(Flex(size = Size(
                 width = UnitValue(100.0, UnitType.PERCENT)),
                 margin = EdgeValue(all = UnitValue(value = 10.0, type = UnitType.REAL))))
+    }
+
+    private fun createContainer(index: Int, products: List<ServerDrivenComponent>): Widget {
+        return Container(
+                children = products
+        ).applyFlex(Flex(
+                flexDirection = FlexDirection.ROW
+        ))
     }
 
 }
